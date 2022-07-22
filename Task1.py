@@ -1,43 +1,46 @@
-# ЗАДАЧА 1
+from pprint import pprint
 
-class Student:
-    def __init__(self, name, surname, gender):
-        self.name = name
-        self.surname = surname
-        self.gender = gender
-        self.finished_courses = []
-        self.courses_in_progress = []
-        self.grades = {}
+def read_cook_book(file):
+    data = {}
+    key = ['ingredient_name', 'quantity', 'measure']
+    with open(file, 'r', encoding='utf-8') as f:
+        while True:
+            ingredients = []
+            name = f.readline().rstrip()
+            if not name:
+                break
+            ingredient_count = f.readline().rstrip()
+            for i in range(int(ingredient_count)):
+                ing = f.readline().rstrip()
+                ing_list = ing.strip().split("|")
+                ingredient = dict(zip(key, ing_list))
+                ingredient['quantity'] = int(ingredient['quantity'])
+                ingredients.append(ingredient)
+            data[name] = ingredients
+            f.readline().rstrip()
+    return data
 
-class Mentor:
-    def __init__(self, name, surname):
-        self.name = name
-        self.surname = surname
-        self.courses_attached = []
+file = 'data.txt'
+data = read_cook_book(file)
+pprint(data)
 
-    def rate_hw(self, student, course, grade):
-        if isinstance(student, Student) and course in self.courses_attached and course in student.courses_in_progress:
-            if course in student.grades:
-                student.grades[course] += [grade]
-            else:
-                student.grades[course] = [grade]
-        else:
-            return 'Ошибка'
+#---------------------------- ЗАДАЧА 2 -------------------------------------
 
-class Lecturer(Mentor):
-    pass
+def get_shop_list_by_dishes(dishes, person):
+    cook_dict = {}
+    for dish in dishes:
+        if dish in data:
+            for ingress_diets in data[dish]:
+                dict_ing = {}
+                if ingress_diets['ingredient_name'] in cook_dict:
+                    quantity = cook_dict[ingress_diets['ingredient_name']].get('quantity') + \
+                               ingress_diets['quantity'] * person
+                    cook_dict[ingress_diets['ingredient_name']].update(quantity=quantity)
+                else:
+                    dict_ing['measure'] = ingress_diets['measure']
+                    dict_ing['quantity'] = ingress_diets['quantity'] * person
+                    cook_dict[ingress_diets['ingredient_name']] = dict_ing
+    return cook_dict
 
-class Reviewer(Mentor):
-    pass
 
-best_student = Student('Ruoy', 'Eman', 'your_gender')
-best_student.courses_in_progress += ['Python']
-
-cool_mentor = Mentor('Some', 'Buddy')
-cool_mentor.courses_attached += ['Python']
-
-cool_mentor.rate_hw(best_student, 'Python', 10)
-cool_mentor.rate_hw(best_student, 'Python', 10)
-cool_mentor.rate_hw(best_student, 'Python', 10)
-
-print(best_student.grades)
+pprint(get_shop_list_by_dishes({'Омлет', 'Фахитос', 'Запеченный картофель'}, 4))
