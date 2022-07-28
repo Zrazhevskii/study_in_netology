@@ -43,21 +43,34 @@ parser()
 
 #---------------------------- ЗАДАЧА 2 -------------------------------------
 
-def get_shop_list_by_dishes(dishes, person):
-    cook_dict = {}
-    for dish in dishes:
-        if dish in data:
-            for ingress_diets in data[dish]:
-                dict_ing = {}
-                if ingress_diets['ingredient_name'] in cook_dict:
-                    quantity = cook_dict[ingress_diets['ingredient_name']].get('quantity') + \
-                               ingress_diets['quantity'] * person
-                    cook_dict[ingress_diets['ingredient_name']].update(quantity=quantity)
-                else:
-                    dict_ing['measure'] = ingress_diets['measure']
-                    dict_ing['quantity'] = ingress_diets['quantity'] * person
-                    cook_dict[ingress_diets['ingredient_name']] = dict_ing
-    return cook_dict
+class YaUploader:
+
+    def __init__(self, token):
+        self.token = token
 
 
-pprint(get_shop_list_by_dishes({'Омлет', 'Фахитос', 'Запеченный картофель'}, 4))
+    def upload(self, file_path):
+        upload_url = "https://cloud-api.yandex.net/v1/disk/resources/upload"
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'OAuth {self.token}'
+        }
+        params = {"path": file_path, "owerwrite": "true"}
+        response = requests.get(upload_url, headers=headers, params=params)
+        pprint(response.json())
+        return response.json()
+
+
+    def upload_to_disk(self, file_path, filename):
+        href = self.upload(file_path=file_path).get('href', '')
+        response = requests.put(href, data=open(filename, 'rb'))
+        response.raise_for_status()
+
+
+
+if __name__ == '__main__':
+
+    with open('1.txt', 'r') as f:
+        token = f.readline().rstrip()
+        uploader = YaUploader(token)
+        pprint(uploader.upload_to_disk('netology/3.txt', '3.txt'))
