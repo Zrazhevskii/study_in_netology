@@ -8,14 +8,12 @@ urls = [
     f'https://www.superheroapi.com/api.php/{TOKEN}/search/Hulk',
     f'https://www.superheroapi.com/api.php/{TOKEN}/search/Thanos',
     f'https://www.superheroapi.com/api.php/{TOKEN}/search/Captain%America',
-]  # список адресов
+]
 
 
 def requests_get(url_all):
-    # принимает список адресов
     r = (requests.get(url) for url in url_all)
     return r
-
 
 def parser():
     # функция парсинга интелекта
@@ -39,7 +37,6 @@ def parser():
             name = intelligence_hero['name']
 
     print(f"Самый интелектуальный {name}, интелект: {intelligence_super_hero}")
-
 
 parser()
 
